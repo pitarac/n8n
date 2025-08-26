@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: traefik
+    image: "traefik"
     restart: always
     command:
       - "--api.insecure=true"
@@ -21,7 +21,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
 
   n8n:
-    image: n8n:latest  
+    image: docker.n8n.io/n8nio/n8n
     restart: always
     ports:
       - "127.0.0.1:5678:5678"
@@ -41,25 +41,17 @@ services:
       - traefik.http.middlewares.n8n.headers.STSPreload=true
       - traefik.http.routers.n8n.middlewares=n8n@docker
     environment:
-      - NODE_ENV=production
       - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
       - N8N_HOST=${SUBDOMAIN}.${DOMAIN_NAME}
       - N8N_PORT=5678
       - N8N_PROTOCOL=https
       - N8N_RUNNERS_ENABLED=true
+      - NODE_ENV=production
       - WEBHOOK_URL=https://${SUBDOMAIN}.${DOMAIN_NAME}/
       - GENERIC_TIMEZONE=${GENERIC_TIMEZONE}
       - TZ=${GENERIC_TIMEZONE}
-      # mova credenciais (auth básica, DB, etc.) para um .env
-      # - N8N_BASIC_AUTH_ACTIVE=true
-      # - N8N_BASIC_AUTH_USER=admin
-      # - N8N_BASIC_AUTH_PASSWORD=...
-      # - DB_TYPE=postgresdb
-      # - ...
     volumes:
-      # ATENÇÃO: path de dados ajustado para /home/n8n
-      - n8n_data:/home/n8n/.n8n
-      # diretório de arquivos locais conforme doc oficial
+      - n8n_data:/home/node/.n8n
       - ./local-files:/files
 
 volumes:
